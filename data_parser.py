@@ -6,6 +6,7 @@ class DataParser():
 
     def __init__(self):
         self.tags_split_pattern = re.compile('[><]')
+        self.ques_cleaning_pattern = re.compile("[\s\n\r\t.,:;\-_\'\"?!#&()]")
         pass
 
     def get_tags(self, tags_file, min_ct = 0, filename = None):
@@ -19,10 +20,10 @@ class DataParser():
             if ct >= min_ct:
                 filtered_tags.append(tag)
 
-		if filename is not None:
-			json_data = json.dumps(filtered_tags)
-			with open(filename,'w') as f:
-				json.dump(json_data,f)
+        if filename is not None:
+            json_data = json.dumps(filtered_tags)
+            with open(filename,'w') as f:
+            	json.dump(json_data,f)
 
         del root
         del tree
@@ -47,3 +48,15 @@ class DataParser():
         del root
         del tree
         return posts
+
+    def build_vocab(self,posts_file,min_count=0):
+        counts = {}
+        with open(posts_file) as f:
+            ques_list = json.load(f)
+        for ques in ques_list:
+            words = [x for x in pattern.split(ques['Post']) if x != '']
+            for word in words:
+                if word not in counts:
+                    counts[word] = 0
+                counts[word] += 1
+        return counts
