@@ -10,7 +10,7 @@ class DataParser():
         self.ques_cleaning_pattern = re.compile("[\s\n\r\t.,:;\-_\'\"?!#&()]")
         pass
 
-    def get_tags(self, tags_file, min_ct = 0, filename = None):
+    def get_tags(self, tags_file, min_ct = 0, target_filename = None):
         tree = ET.parse(tags_file)
         root = tree.getroot()
         tags = {}
@@ -21,8 +21,8 @@ class DataParser():
             if ct >= min_ct:
                 filtered_tags.append(tag)
 
-        if filename is not None:
-            with open(filename,'w') as f:
+        if target_filename is not None:
+            with open(target_filename,'w') as f:
             	json.dump(filtered_tags,f)
 
         del filtered_tags
@@ -61,8 +61,9 @@ class DataParser():
         del tree
         #return posts
 
-    def build_vocab(self,posts_file,min_count=0):
+    def build_vocab(self,posts_file,min_count=0,target_filename=None):
         counts = {}
+        vocab = []
         with open(posts_file) as f:
             ques_list = json.load(f)
         for ques in ques_list:
@@ -71,4 +72,18 @@ class DataParser():
                 if word not in counts:
                     counts[word] = 0
                 counts[word] += 1
-        return counts
+        for key,value in counts.items():
+            temp = {}
+            if (value > min_count):
+                temp['Word'] = key
+                temp['Count'] = value
+                vocab.append(temp)
+        temp = {}
+        temp['Word'] = '<unk>'
+        temp['Count'] = 0
+        vocab.append(temp)
+        if target_filename is not None:
+            with open(target_filename,'w') as f:
+                json.dump(vocab,f)
+        del counts
+        #return counts
