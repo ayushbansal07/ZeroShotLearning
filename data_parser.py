@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import re
+import json
 
 class DataParser():
 
@@ -7,7 +8,7 @@ class DataParser():
         self.tags_split_pattern = re.compile('[><]')
         pass
 
-    def get_tags(self, tags_file, min_ct = 0):
+    def get_tags(self, tags_file, min_ct = 0, filename = None):
         tree = ET.parse(tags_file)
         root = tree.getroot()
         tags = {}
@@ -17,6 +18,11 @@ class DataParser():
         for tag,ct in tags.items():
             if ct >= min_ct:
                 filtered_tags.append(tag)
+
+		if filename is not None:
+			json_data = json.dumps(filtered_tags)
+			with open(filename,'w') as f:
+				json.dump(json_data,f)
 
         del root
         del tree
