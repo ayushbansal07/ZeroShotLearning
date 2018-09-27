@@ -33,17 +33,27 @@ class DataParser():
         t = tags_string[1:-1]
         return [x for x in self.tags_split_pattern.split(t) if x != '']
 
-    def get_posts_and_tags(self,posts_file):
+    def get_posts_and_tags(self,posts_file, target_filename = None):
         tree = ET.parse(posts_file)
         root = tree.getroot()
         posts = []
+        json_list = []
         for child in root:
             try:
                 body, tags = child.attrib['Body'], child.attrib['Tags']
                 tags_list = self._split_tags(tags)
                 posts.append((body,tags_list))
+                temp = {}
+                temp['Post'] = body
+                temp['Tags'] = tags
+                json_list.append(temp)
             except:
                 pass
+
+		if filename is not None:
+			json_q_data = json.dumps(json_list)
+			with open(target_filename,'w') as f:
+				json.dump(json_q_data,f)
 
         del root
         del tree
