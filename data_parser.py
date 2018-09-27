@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import re
 import json
+from bs4 import BeautifulSoup
 
 class DataParser():
 
@@ -21,13 +22,12 @@ class DataParser():
                 filtered_tags.append(tag)
 
         if filename is not None:
-            json_data = json.dumps(filtered_tags)
             with open(filename,'w') as f:
-            	json.dump(json_data,f)
+            	json.dump(filtered_tags,f)
 
+        del filtered_tags
         del root
         del tree
-        return filtered_tags
 
     def _split_tags(self,tags_string):
         t = tags_string[1:-1]
@@ -36,35 +36,37 @@ class DataParser():
     def get_posts_and_tags(self,posts_file, target_filename = None):
         tree = ET.parse(posts_file)
         root = tree.getroot()
-        posts = []
+        #posts = []
         json_list = []
         for child in root:
             try:
                 body, tags = child.attrib['Body'], child.attrib['Tags']
                 tags_list = self._split_tags(tags)
-                posts.append((body,tags_list))
+                soup = BeautifulSoup(body,'html.parser')
+                body = soup.text
+                #posts.append((body,tags_list))
                 temp = {}
                 temp['Post'] = body
-                temp['Tags'] = tags
+                temp['Tags'] = tags_list
                 json_list.append(temp)
             except:
                 pass
 
-		if filename is not None:
-			json_q_data = json.dumps(json_list)
-			with open(target_filename,'w') as f:
-				json.dump(json_q_data,f)
+        if target_filename is not None:
+        	with open(target_filename,'w') as f:
+        		json.dump(json_list,f)
 
+        del json_list
         del root
         del tree
-        return posts
+        #return posts
 
     def build_vocab(self,posts_file,min_count=0):
         counts = {}
         with open(posts_file) as f:
             ques_list = json.load(f)
         for ques in ques_list:
-            words = [x for x in pattern.split(ques['Post']) if x != '']
+            words = [x for x in self.ques_cleaning_pattern.split(ques['Post']) if x != '']
             for word in words:
                 if word not in counts:
                     counts[word] = 0
