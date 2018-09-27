@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import re
 import json
 from bs4 import BeautifulSoup
+import numpy as np
 
 class DataParser():
 
@@ -25,9 +26,10 @@ class DataParser():
             with open(target_filename,'w') as f:
             	json.dump(filtered_tags,f)
 
-        del filtered_tags
+            del filtered_tags
         del root
         del tree
+        return filtered_tags
 
     def _split_tags(self,tags_string):
         t = tags_string[1:-1]
@@ -85,5 +87,36 @@ class DataParser():
         if target_filename is not None:
             with open(target_filename,'w') as f:
                 json.dump(vocab,f)
-        del counts
-        #return counts
+            del counts
+        else:
+            return counts
+
+    def bag_of_words(self,vocab_file,posts_file,target_filename=None):
+        with open(vocab_file) as f:
+            vocab = json.load(f)
+            vocab_size = len(vocab)
+            vocab_rev = {}
+            i = 0
+            for x in vocab:
+                vocab_rev[x['Word']] = i
+                i += 1
+        with open(posts_file) as f:
+            ques_list = json.load(f)
+
+        bow = []
+        for ques in ques_list:
+            words = [x for x in self.ques_cleaning_pattern.split(ques['Post']) if x != '']
+            temp = np.zeros(vocab_size)
+            for word in words:
+                if word in vocab_rev:
+                    temp[vocab_rev[word]] += 1
+                else:
+                    temp[vocab_rev['<unk>']] += 1
+            bow.append(temp)
+
+        bow = np.array(bow)
+        if target_filename is not None:
+            np.save(target_filename, bow)
+            del bow
+        else:
+            return bow
