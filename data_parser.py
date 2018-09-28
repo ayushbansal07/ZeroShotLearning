@@ -8,7 +8,7 @@ class DataParser():
 
     def __init__(self):
         self.tags_split_pattern = re.compile('[><]')
-        self.ques_cleaning_pattern = re.compile("[\s\n\r\t.,:;\-_\'\"?!#&()]")
+        self.ques_cleaning_pattern = re.compile("[\s\n\r\t.,:;\-_\'\"?!#&()\/%\[\]\{\}\<\>\\$@\!\*\+\=]")
         pass
 
     def get_tags(self, tags_file, min_ct = 0, target_filename = None):
@@ -35,7 +35,7 @@ class DataParser():
         t = tags_string[1:-1]
         return [x for x in self.tags_split_pattern.split(t) if x != '']
 
-    def get_posts_and_tags(self,posts_file, target_filename = None):
+    def get_posts_and_tags(self,posts_file, target_filename = None,max_ques = -1):
         tree = ET.parse(posts_file)
         root = tree.getroot()
         #posts = []
@@ -53,7 +53,15 @@ class DataParser():
                 json_list.append(temp)
             except:
                 pass
-
+        if max_ques != -1:
+            json_list_filtered = []
+            perm = np.random.permutation(len(json_list))[:max_ques]
+            for p in perm:
+                json_list_filtered.append(json_list[p])
+            del json_list
+            json_list = json_list_filtered
+            del json_list_filtered
+        print(len(json_list))
         if target_filename is not None:
         	with open(target_filename,'w') as f:
         		json.dump(json_list,f)
@@ -74,6 +82,7 @@ class DataParser():
                 if word not in counts:
                     counts[word] = 0
                 counts[word] += 1
+        
         for key,value in counts.items():
             temp = {}
             if (value > min_count):
@@ -114,7 +123,7 @@ class DataParser():
                     temp[vocab_rev['<unk>']] += 1
             bow.append(temp)
 
-        bow = np.array(bow)
+        #bow = np.array(bow)
         if target_filename is not None:
             np.save(target_filename, bow)
             del bow
