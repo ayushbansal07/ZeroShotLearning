@@ -3,6 +3,7 @@ import re
 import json
 from bs4 import BeautifulSoup
 import numpy as np
+from scipy import sparse
 
 class DataParser():
 
@@ -82,7 +83,7 @@ class DataParser():
                 if word not in counts:
                     counts[word] = 0
                 counts[word] += 1
-        
+
         for key,value in counts.items():
             temp = {}
             if (value > min_count):
@@ -129,3 +130,39 @@ class DataParser():
             del bow
         else:
             return bow
+
+    def get_tags_one_hot(self,tags_file,posts_file,target_filename=None,to_sparse=False):
+        with open(tags_file) as f:
+            tags_list = json.load(f)
+
+        tags_rev_list = {}
+        i = 0
+        for tag in tags_list:
+            tags_rev_list[tag] = i
+            i += 1
+
+        one_hot = []
+        num_tags = len(tags_list)
+        del tags_list
+        with open(posts_file) as f:
+            posts_list = json.load(f)
+        for post in posts_list:
+            ques_tags = post['Tags']
+            temp = np.zeros(num_tags)
+            for tag in ques_tags:
+                try:
+                    temp[tags_rev_list[tag]] = 1
+                except:
+                    pass
+            one_hot.append(temp)
+        del posts_list
+        if to_sparse:
+            one_hot = sparse.csr_matrix(one_hot)
+        if target_filename is not None:
+            if to_sparse:
+                one_hot = sparse.csr_matrix(one_hot)
+                sparse.save_npz(target_filename,one_hot)
+            else:
+                np.save(target_filename,one_hot)
+        else:
+            return one_hot
