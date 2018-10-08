@@ -13,9 +13,9 @@ if os.path.exists('similarity_matrix.npy'):
 	similarity_matrix = np.load('similarity_matrix.npy')
 else:
 	similarity_matrix = tran_RBM_and_compute_simiarity(y_data)
-
-selected_classes = np.random.randint(0, 700, (20))
-#selected_classes = select_classes(similarity_matrix,NUM_SEEN_CLASSES,'max-deg-uu')
+similarity_matrix = 1/similarity_matrix
+#selected_classes = np.random.randint(0, 700, (20))
+selected_classes = select_classes(similarity_matrix,NUM_SEEN_CLASSES,'max-deg-uu')
 #selected_classes = [22, 104, 146, 204, 237, 290, 345, 399, 417, 425, 440, 511, 527, 565, 570, 606, 697, 708, 715, 741]
 print(selected_classes)
 X_data = sparse.load_npz('tfifdf_transformed.npz')
@@ -34,7 +34,7 @@ models = logreg_model(X_train,selected_classes,y_train)
 y_pred  = np.zeros((y_test.shape[0],NUM_SEEN_CLASSES))
 i = 0
 for key,model in models.items():
-	y_pred[:,i] = model.predict(X_test)
+	y_pred[:,i] = model.predict_proba(X_test)[:,1]
 	i += 1
 
 unseen_classes = list(set(range(y_data.shape[1])) - set(selected_classes))
@@ -42,4 +42,4 @@ score_unseen = compute_unseen_class_scores(y_pred,similarity_matrix,selected_cla
 
 precision = compute_precision(y_test[:,unseen_classes],score_unseen)
 
-print("Precision @ 5 : ",precision)
+print("Precision @ 5 : %.6f" % (precision))
