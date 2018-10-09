@@ -140,7 +140,7 @@ def train_RBM_and_compute_simiarity(class_array,target_filename,reduced_dimensio
   low_dem_rep = []
   for i in range(0,num_tags):
     classes_rep[i][i] = 1
-    low_dem_rep.append(r.run_visible(classes_rep[i]))
+    low_dem_rep.append(r.run_visible(classes_rep[i].reshape(1,num_tags)))
   simi_matrix = np.zeros((num_tags,num_tags))
   low_dem_rep =np.asarray(low_dem_rep)
   for i in range(0,num_tags):
