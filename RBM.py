@@ -49,7 +49,7 @@ class RBM:
 
       self.weights += learning_rate * ((pos_associations - neg_associations) / num_examples)
 
-      error = np.sum((data - neg_visible_probs) ** 2)
+      error = np.sum(np.square(data - neg_visible_probs))
       if self.debug_print:
         print("Epoch %s: error is %s" % (epoch, error))
 
@@ -126,13 +126,13 @@ class RBM:
   def _logistic(self, x):
     return 1.0 / (1 + np.exp(-x))
 
-def train_RBM_and_compute_simiarity(class_array,reduced_dimension=100,epochs=5000):
+def train_RBM_and_compute_simiarity(class_array,target_filename,reduced_dimension=100,epochs=5000):
   #num_tags = 1000    #number of tags
   #reduced_demension = 100 #reduced demension
   #epochs = 5000
   #filename =""    # name of np array containing one hot encoding for classes
   num_tags = class_array.shape[1]
-  r = RBM(num_visible = num_tags, num_hidden = reduced_demension)
+  r = RBM(num_visible = num_tags, num_hidden = reduced_dimension)
   training_data = class_array
   r.train(training_data, max_epochs = epochs)
   print(r.weights)
@@ -151,5 +151,5 @@ def train_RBM_and_compute_simiarity(class_array,reduced_dimension=100,epochs=500
         val  = math.exp(np.linalg.norm(low_dem_rep[i]-low_dem_rep[j])**2/10**2)
         simi_matrix[i][j] =val
         simi_matrix[j][i] = val
-  np.save("similarity_matrix.npy",simi_matrix)
+  np.save(target_filename,simi_matrix)
   return simi_matrix

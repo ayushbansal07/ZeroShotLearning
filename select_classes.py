@@ -4,7 +4,7 @@ def select_classes(K, n, selection_strategy):
     if selection_strategy == 'max-deg-uu':
         n_classes = K.shape[0]
         seen = []
-        unseen = range(n_classes)
+        unseen = list(range(n_classes))
         
         while len(seen) < n:
             K_UU = K[unseen, :][:, unseen]
@@ -19,7 +19,7 @@ def select_classes(K, n, selection_strategy):
     elif selection_strategy == 'max-ent-uu':
         n_classes = K.shape[0]
         seen = []
-        unseen = range(n_classes)
+        unseen = list(range(n_classes))
         
         while len(seen) < n:
             K_UU = K[unseen, :][:, unseen]

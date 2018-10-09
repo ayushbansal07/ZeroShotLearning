@@ -7,18 +7,20 @@ import numpy as np
 import os
 
 NUM_SEEN_CLASSES = 20
-y_data = np.load('tags_one_hot.npy')
+DATA_DIR = 'data/dbaData/output/'
+y_data = sparse.load_npz(DATA_DIR+'tags_one_hot_sparse.npz')
+y_data = y_data.todense()
 
-if os.path.exists('similarity_matrix.npy'):
-	similarity_matrix = np.load('similarity_matrix.npy')
+if os.path.exists(DATA_DIR+'similarity_matrix.npy'):
+	similarity_matrix = np.load(DATA_DIR+'similarity_matrix.npy')
 else:
-	similarity_matrix = tran_RBM_and_compute_simiarity(y_data)
+	similarity_matrix = train_RBM_and_compute_simiarity(y_data,target_filename=DATA_DIR+'similarity_matrix.npy')
 similarity_matrix = 1/similarity_matrix
 #selected_classes = np.random.randint(0, 700, (20))
 selected_classes = select_classes(similarity_matrix,NUM_SEEN_CLASSES,'max-deg-uu')
 #selected_classes = [22, 104, 146, 204, 237, 290, 345, 399, 417, 425, 440, 511, 527, 565, 570, 606, 697, 708, 715, 741]
 print(selected_classes)
-X_data = sparse.load_npz('tfifdf_transformed.npz')
+X_data = sparse.load_npz(DATA_DIR+'tfifdf_transformed.npz')
 X_data = X_data.todense()
 #y_data = np.load('tags_one_hot.npy')
 

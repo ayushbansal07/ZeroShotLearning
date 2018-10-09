@@ -28,9 +28,12 @@ class DataParser():
             	json.dump(filtered_tags,f)
 
             del filtered_tags
+        else:
+            del root
+            del tree
+            return filtered_tags
         del root
         del tree
-        return filtered_tags
 
     def _split_tags(self,tags_string):
         t = tags_string[1:-1]
