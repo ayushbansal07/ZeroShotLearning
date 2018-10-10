@@ -15,7 +15,7 @@ if os.path.exists(DATA_DIR+'similarity_matrix.npy'):
 	similarity_matrix = np.load(DATA_DIR+'similarity_matrix.npy')
 else:
 	similarity_matrix = train_RBM_and_compute_simiarity(y_data,target_filename=DATA_DIR+'similarity_matrix.npy')
-similarity_matrix = 1/similarity_matrix
+#similarity_matrix = 1/similarity_matrix
 #selected_classes = np.random.randint(0, 700, (20))
 selected_classes = select_classes(similarity_matrix,NUM_SEEN_CLASSES,'max-deg-uu')
 #selected_classes = [22, 104, 146, 204, 237, 290, 345, 399, 417, 425, 440, 511, 527, 565, 570, 606, 697, 708, 715, 741]
