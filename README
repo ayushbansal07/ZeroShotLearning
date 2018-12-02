@@ -6,13 +6,13 @@ Data files to download-
 Extract only the files Tags.xml and Posts.xml .
 Put the two files of each of the 2 subsystems in the following data folders - data/dbaData and data/unixData respectively.
 
-=============================================================================================================================
+============================================================================================================================
 
 PreProcessing - 
 Run python prepare_data.py 
 to perform pre-processing over the data files and generate the required files for the experiment. You will need to change the parameter DATA_DIR in prepare_data.py to either data/dbaData or data/unixData depending the subsystem you are working with. The output is generated in data/dbaData/output or data/unixData/output respectively.
 
-==============================================================================================================================
+============================================================================================================================
 
 Experiment - 
 In order to run the experiment you need to run the command - 
@@ -25,7 +25,7 @@ where,
 
 The code reads the data and then creates a similarity_matrix using the boltzman machine. If the file similarity_matrix.npy is already present in data_dir, it skips its recomputation, if it is not present, it trains the similarity_matrix again and saves in the data_dir folder. It then runs the Active Zero Shot Learning Algorithm and gets the Precision @ 5 scores and produces the final plot and png file.
 
-===================================================================================================================================
+============================================================================================================================
 
 Requirements - 
 
