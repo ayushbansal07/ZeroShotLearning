@@ -10,8 +10,10 @@ def compute_precision(scores_gt, scores_pred):
     num_questions = np.shape(scores_pred)[0]
 
     for i in range(num_questions):
+        n_tags = np.sum(scores_gt[i,:])
         for j in np.argsort(scores_pred[i,:])[-5:]:
             if scores_gt[i, j]:
-                precision += 1
+                precision += 1.0# * 5 / min(5, n_tags)
 
+    print(precision)
     return precision/num_questions
